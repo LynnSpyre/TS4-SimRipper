@@ -250,16 +250,16 @@ namespace TS4SimRipper
                                 foreach (IResourceIndexEntry indexEntry in p.GetResourceList)
                                 {
                                     (uint ResourceType, uint ResourceGroup, ulong Instance) key = (indexEntry.ResourceType, indexEntry.ResourceGroup, indexEntry.Instance);
+                                    add_keys(paths, j, p, key);
 
-                                    if (!this.allCCInstances.ContainsKey(key))
+                                    if (indexEntry.ResourceGroup == 0x80000000)
                                     {
-                                        this.allCCInstances.Add(key, (paths[j], p));
+                                        (uint ResourceType, uint ResourceGroup, ulong Instance) zero_group_key = (indexEntry.ResourceType, 0, indexEntry.Instance);
+                                        add_keys(paths, j, p, zero_group_key);
 
                                     }
-                                    if (!this.allInstances.ContainsKey(key))
-                                    {
-                                        this.allInstances.Add(key, (paths[j], p));
-                                    }
+
+
                                 }
                             }
                             ccPacks.Add(p);
@@ -294,6 +294,19 @@ namespace TS4SimRipper
                 return false;
             }
             return true;
+        }
+
+        private void add_keys(List<string> paths, int j, Package p, (uint ResourceType, uint ResourceGroup, ulong Instance) key)
+        {
+            if (!this.allCCInstances.ContainsKey(key))
+            {
+                this.allCCInstances.Add(key, (paths[j], p));
+
+            }
+            if (!this.allInstances.ContainsKey(key))
+            {
+                this.allInstances.Add(key, (paths[j], p));
+            }
         }
 
         private void SaveStream(IResourceIndexEntry irie, BinaryReader br, Package pack)
@@ -355,7 +368,7 @@ namespace TS4SimRipper
             if (tgi.Instance == 0ul) return null;
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
             if (this.allInstances.ContainsKey(key)) { 
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
                 if (irie != null)
@@ -388,7 +401,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -422,7 +435,7 @@ namespace TS4SimRipper
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 if (this.allInstances.ContainsKey(key))
                 {
@@ -461,7 +474,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -496,7 +509,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type  & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -537,7 +550,7 @@ namespace TS4SimRipper
 
             if (this.allInstances.ContainsKey(key))
             {
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -599,7 +612,7 @@ namespace TS4SimRipper
             if (tgi.Instance == 0ul) return null;
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
 
-            Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+            Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
             if (this.allInstances.ContainsKey(key))
             {
                 Package p = this.allInstances[key].Item2;
@@ -633,7 +646,7 @@ namespace TS4SimRipper
             (uint ResourceType, uint ResourceGroup, ulong Instance) keyLrle = ((uint)ResourceTypes.LRLE, tgi.Group, tgi.Instance);
 
 
-            Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+            Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
             Predicate<IResourceIndexEntry> predLrle = r => r.ResourceType == (uint)ResourceTypes.LRLE & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
             if (this.allInstances.ContainsKey(key) || this.allInstances.ContainsKey(keyLrle))
             {
@@ -708,7 +721,7 @@ namespace TS4SimRipper
             if (tgi.Instance == 0ul) return null;
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
 
-            Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+            Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
             if (this.allInstances.ContainsKey(key))
             {
                 Package p = this.allInstances[key].Item2;
@@ -742,7 +755,7 @@ namespace TS4SimRipper
 
             if (tgi.Instance == 0ul) return null;
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
-            Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+            Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
             if (this.allInstances.ContainsKey(key))
             {
                 Package p = this.allInstances[key].Item2;
@@ -850,7 +863,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -882,7 +895,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -923,7 +936,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
 
                 Package p = this.allInstances[key].Item2;
@@ -957,7 +970,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -996,7 +1009,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -1033,7 +1046,7 @@ namespace TS4SimRipper
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
-                Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -1064,7 +1077,7 @@ namespace TS4SimRipper
             if (tgi.Instance == 0ul) return null;
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
 
-            Predicate<IResourceIndexEntry> pred = r => (r.ResourceType == tgi.Type) & r.ResourceGroup == tgi.Group & r.Instance == tgi.Instance;
+            Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
             if (this.allInstances.ContainsKey(key))
             {
                 string err = "";
