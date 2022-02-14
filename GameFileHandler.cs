@@ -107,29 +107,22 @@ namespace TS4SimRipper
             {
                 List<string> pathsSim = new List<string>(Directory.GetFiles(TS4FilesPath, "Simulation*Build*.package", SearchOption.AllDirectories));
                 List<string> pathsClient = new List<string>(Directory.GetFiles(TS4FilesPath, "Client*Build*.package", SearchOption.AllDirectories));
-                List<string> pathsNoLegacySim = new List<string>();
-                List<string> pathsNoLegacyClient = new List<string>();
-
-                for (int i = 0; i < pathsSim.Count; i++)
-                {
-                    if (!pathsSim[i].Contains("Delta_LE"))
-                    {
-                        pathsNoLegacySim.Add(pathsSim[i]);
-                    }
-                }
-                for (int i = 0; i < pathsClient.Count; i++)
-                {
-                    if (!pathsClient[i].Contains("Delta_LE"))
-                    {
-                        pathsNoLegacyClient.Add(pathsClient[i]);
-                    }
-                }
+                List<string> orderedPathsSim = new List<string>();
+                List<string> orderedPathsClient = new List<string>();
 
 
-                pathsNoLegacySim.Sort();
-                pathsNoLegacyClient.Sort();
-                paths.AddRange(pathsNoLegacySim);
-                paths.AddRange(pathsNoLegacyClient);
+                List<string> emptyList = new List<string>();
+                List<string> packPrefixes = new List<string>() { "EP", "GP", "SP", "FP" };
+                addPathsAccordingToPatchPriority(pathsClient, ref orderedPathsClient, "", "ClientDelta", "ClientFull", packPrefixes);
+                addPathsAccordingToPatchPriority(pathsSim, ref orderedPathsSim, "", "SimulationDelta", "SimulationFull", packPrefixes);
+
+                addPathsAccordingToPatchPriority(pathsClient, ref orderedPathsClient, "Client", "ClientDelta", "ClientFull", emptyList);
+                addPathsAccordingToPatchPriority(pathsSim, ref orderedPathsSim, "Simulation", "SimulationDelta", "SimulationFull", emptyList);
+
+                //pathsNoLegacySim.Sort();
+                //pathsNoLegacyClient.Sort();
+                paths.AddRange(orderedPathsSim);
+                paths.AddRange(orderedPathsClient);
             }
             catch (DirectoryNotFoundException e)
             {
@@ -171,7 +164,6 @@ namespace TS4SimRipper
                     {
                         continue;
                     }
-
                     try
                     {
                         Package p = OpenPackage(paths[i], false);
@@ -189,15 +181,20 @@ namespace TS4SimRipper
 
                                 (uint ResourceType, uint ResourceGroup, ulong Instance) key = (indexEntry.ResourceType, indexEntry.ResourceGroup, indexEntry.Instance);
 
-                                if (!this.allMaxisInstances.ContainsKey(key))
+                                if (this.allMaxisInstances.ContainsKey(key))
                                 {
-                                    this.allMaxisInstances.Add(key, (paths[i], p));
+                                    this.allMaxisInstances.Remove(key);
                                 }
 
-                                if (!this.allInstances.ContainsKey(key))
+                                if (this.allInstances.ContainsKey(key))
                                 {
-                                    this.allInstances.Add(key, (paths[i], p));
+                                    this.allInstances.Remove(key);
+
                                 }
+
+                                this.allMaxisInstances.Add(key, (paths[i], p));
+                                this.allInstances.Add(key, (paths[i], p));
+
                             }
                         }
                         gamePacks.Add(p);
@@ -296,17 +293,66 @@ namespace TS4SimRipper
             return true;
         }
 
+        private static void addPathsAccordingToPatchPriority(List<string> inputPaths, ref List<string> paths, string prefix, string packDelta,  string packFull, List<string> packTypes)
+        {
+            getPackageAndAddIfValid(inputPaths, ref paths, prefix, packFull, packTypes);
+            getPackageAndAddIfValid(inputPaths, ref paths, prefix, packDelta, packTypes);
+
+        }
+
+        private static void getPackageAndAddIfValid(List<string> inputPaths, ref List<string> paths, string prefix, string desiredPackagePrefix, List<string> packTypes)
+        {
+            for (int i = 0; i < inputPaths.Count; i++)
+            {
+                if (packTypes.Count == 0)
+                {
+                    if (inputPaths[i].Contains(desiredPackagePrefix))
+                    {
+                        paths.Add(inputPaths[i]);
+
+                    }
+                }
+                else
+                {
+                    if (packTypes.Count != 0)
+                    {
+
+                        string[] directories = inputPaths[i].Split(Path.DirectorySeparatorChar);
+
+                        bool isBGPackage = true;
+
+                        foreach (string packType in packTypes)
+                        {
+                            if (directories[directories.Length - 2].Contains(packType))
+                            {
+                                isBGPackage = false;
+                                break;
+                            }
+                        }
+                        if (!isBGPackage & prefix == "" & inputPaths[i].Contains(desiredPackagePrefix))
+                        {
+
+                            paths.Add(inputPaths[i]);
+
+                        }
+
+                    }
+                }
+            }
+        }
+
         private void add_CC_keys(List<string> paths, int j, Package p, (uint ResourceType, uint ResourceGroup, ulong Instance) key)
         {
-            if (!this.allCCInstances.ContainsKey(key))
+            if (this.allCCInstances.ContainsKey(key))
             {
-                this.allCCInstances.Add(key, (paths[j], p));
+                this.allCCInstances.Remove(key);
 
             }
             if (this.allInstances.ContainsKey(key))
             {
                 this.allInstances.Remove(key);
             }
+            this.allCCInstances.Add(key, (paths[j], p));
 
             this.allInstances.Add(key, (paths[j], p));
 
