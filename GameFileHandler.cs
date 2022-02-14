@@ -247,12 +247,12 @@ namespace TS4SimRipper
                                 foreach (IResourceIndexEntry indexEntry in p.GetResourceList)
                                 {
                                     (uint ResourceType, uint ResourceGroup, ulong Instance) key = (indexEntry.ResourceType, indexEntry.ResourceGroup, indexEntry.Instance);
-                                    add_CC_keys(paths, j, p, key);
+                                    add_CC_keys(ccPaths, j, p, key);
 
                                     if (indexEntry.ResourceGroup == 0x80000000)
                                     {
                                         (uint ResourceType, uint ResourceGroup, ulong Instance) zero_group_key = (indexEntry.ResourceType, 0, indexEntry.Instance);
-                                        add_CC_keys(paths, j, p, zero_group_key);
+                                        add_CC_keys(ccPaths, j, p, zero_group_key);
 
                                     }
 

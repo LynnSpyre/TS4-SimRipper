@@ -75,7 +75,7 @@ namespace TS4SimRipper
         //    return new List<ulong>();
         //}
 
-        public CASModifierTuning(Package[] packages, string[] packageNames, bool[] isCC, Form1 form, Dictionary<(uint, uint, ulong), (string, Package)> allKeys, Dictionary<(uint, uint, ulong), (string, Package)> allCCKeys)
+        public CASModifierTuning(Package[] packages, string[] packageNames, Form1 form, Dictionary<(uint, uint, ulong), (string, Package)> allKeys, Dictionary<(uint, uint, ulong), (string, Package)> allCCKeys)
         {
             this.tuning = new List<Tuning>();
 

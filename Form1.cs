@@ -98,7 +98,7 @@ namespace TS4SimRipper
 			
 			try
 			{
-            CASTuning = new CASModifierTuning(gamePackages, gamePackageNames, notBaseGame, this, allMaxisInstances, allCCInstances);
+            CASTuning = new CASModifierTuning(gamePackages, gamePackageNames, this, allMaxisInstances, allCCInstances);
 			}
 
             catch (Exception e)
