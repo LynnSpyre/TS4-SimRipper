@@ -250,12 +250,12 @@ namespace TS4SimRipper
                                 foreach (IResourceIndexEntry indexEntry in p.GetResourceList)
                                 {
                                     (uint ResourceType, uint ResourceGroup, ulong Instance) key = (indexEntry.ResourceType, indexEntry.ResourceGroup, indexEntry.Instance);
-                                    add_keys(paths, j, p, key);
+                                    add_CC_keys(paths, j, p, key);
 
                                     if (indexEntry.ResourceGroup == 0x80000000)
                                     {
                                         (uint ResourceType, uint ResourceGroup, ulong Instance) zero_group_key = (indexEntry.ResourceType, 0, indexEntry.Instance);
-                                        add_keys(paths, j, p, zero_group_key);
+                                        add_CC_keys(paths, j, p, zero_group_key);
 
                                     }
 
@@ -296,17 +296,20 @@ namespace TS4SimRipper
             return true;
         }
 
-        private void add_keys(List<string> paths, int j, Package p, (uint ResourceType, uint ResourceGroup, ulong Instance) key)
+        private void add_CC_keys(List<string> paths, int j, Package p, (uint ResourceType, uint ResourceGroup, ulong Instance) key)
         {
             if (!this.allCCInstances.ContainsKey(key))
             {
                 this.allCCInstances.Add(key, (paths[j], p));
 
             }
-            if (!this.allInstances.ContainsKey(key))
+            if (this.allInstances.ContainsKey(key))
             {
-                this.allInstances.Add(key, (paths[j], p));
+                this.allInstances.Remove(key);
             }
+
+            this.allInstances.Add(key, (paths[j], p));
+
         }
 
         private void SaveStream(IResourceIndexEntry irie, BinaryReader br, Package pack)
