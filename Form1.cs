@@ -425,6 +425,7 @@ namespace TS4SimRipper
                 if (smod == null) continue;
 
                 string modName = smod.region.ToString();
+                Console.Write(modName);
                 if (modifierNames != null)
                 {
                     string tmp = "";
@@ -481,7 +482,6 @@ namespace TS4SimRipper
                 morphInfo += "Sculpt: " + tgi.ToString() + " (" + sculpt.region.ToString() + ")" + Environment.NewLine;
 
             }
-            currentPhysique = physiqueWeights;
             currentName = sim.first_name + " " + sim.last_name;
 
             string worldName = "";
