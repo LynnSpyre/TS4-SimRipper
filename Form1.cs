@@ -208,6 +208,7 @@ namespace TS4SimRipper
             {
                 sims_listBox.Items.Add(simsList[i]);
             }
+
         }
 
         public class SimListing
@@ -389,7 +390,120 @@ namespace TS4SimRipper
         //    }
         //}
 
-        private void DisplaySim(TS4SaveGame.SimData sim, SimOccult occultState, int desiredLevelOfDetail)
+        private void SaveSimInfo(TS4SaveGame.SimData sim)
+        {
+            string tonePackage = "";
+
+            string morphInfo = "";
+            ulong[] sculpts = new ulong[0];
+            TS4SaveGame.Modifier[] faceModifiers = new TS4SaveGame.Modifier[0];
+            TS4SaveGame.Modifier[] bodyModifiers = new TS4SaveGame.Modifier[0];
+            string[] physique = null;
+            TS4SaveGame.OutfitData[] outfits = new TS4SaveGame.OutfitData[0];
+            ulong skintone = 0;
+            float skincolorShift = 0;
+            var currentTONE = FetchGameTONE(new TGI((uint)ResourceTypes.TONE, 0, skintone), out tonePackage, ref errorList);
+
+            Stream s2 = new MemoryStream(sim.facial_attr);
+            TS4SaveGame.BlobSimFacialCustomizationData morphs = Serializer.Deserialize<TS4SaveGame.BlobSimFacialCustomizationData>(s2);
+            sculpts = morphs.sculpts != null ? morphs.sculpts : new ulong[0];
+            faceModifiers = morphs.face_modifiers != null ? morphs.face_modifiers : new TS4SaveGame.Modifier[0];
+            bodyModifiers = morphs.body_modifiers != null ? morphs.body_modifiers : new TS4SaveGame.Modifier[0];
+            physique = sim.physique.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            outfits = sim.outfits.outfits;
+            skintone = sim.skin_tone;
+            //skincolorShift = sim.GetType().GetProperty("skin_tone_val_shift") != null ? sim.skin_tone_val_shift : 0;
+            skincolorShift = sim.skin_tone_val_shift;
+
+            Dictionary<ulong, string> modifierNames = CASTuning.CASModifierNames(currentSpecies, occultState, currentAge, currentGender);
+            Dictionary<ulong, float> modifierScaling = CASTuning.CASModifierScales(currentSpecies, occultState, currentAge, currentGender);
+            //List<Dictionary<ulong, float>> sculptWeights;
+            //List<ulong> dampenModifiers = CASTuning.SculptDampening(currentSpecies, occultState, currentAge, currentGender, out sculptWeights);
+
+            foreach (TS4SaveGame.Modifier m in faceModifiers)
+            {
+                TGI tgi = new TGI((uint)ResourceTypes.SimModifier, 0, m.key);
+                SMOD smod = FetchGameSMOD(tgi, ref errorList);
+                if (smod == null) continue;
+
+                string modName = smod.region.ToString();
+                if (modifierNames != null)
+                {
+                    string tmp = "";
+                    if (modifierNames.TryGetValue(m.key, out tmp)) modName = tmp;
+                }
+                float modAdjust = 1f;
+                if (modifierScaling != null)
+                {
+                    float tmp;
+                    if (modifierScaling.TryGetValue(m.key, out tmp)) modAdjust = tmp;
+                }
+                float modDampen = 1f;
+                //int dampInd = dampenModifiers.IndexOf(m.key);
+                //if (dampInd >= 0)
+                //{
+                //    float damp = 0;
+                //    foreach (ulong u in sculpts)
+                //    {
+                //        if (sculptWeights[dampInd].TryGetValue(u, out damp)) modDampen = damp;
+                //        break;
+                //    }
+                //}
+                float modOffset = 0f;
+                //if (modifierOffsets != null)
+                //{
+                //    float tmp;
+                //    if (modifierOffsets.TryGetValue(m.key, out tmp)) modOffset = tmp;
+                //}
+                float[] physiqueWeights = new float[physique.Length];
+                if (currentSpecies == Species.Human)
+                {
+                    for (int i = 0; i < physique.Length; i++)
+                    {
+                        if (float.TryParse(physique[i], NumberStyles.Float, CultureInfo.InvariantCulture, out physiqueWeights[i]))
+                        {
+
+                        }
+                    }
+                }
+
+
+                currentPhysique = physiqueWeights;
+
+                string worldName = "";
+                string info = "Name: " + currentName + Environment.NewLine + "Household: " + sim.household_name + ", " +
+                    "World: " + (worldNames.TryGetValue(sim.zone_id, out worldName) ? worldName : "None") +
+                    Environment.NewLine + "Age: " + ((AgeGender)sim.age).ToString() + Environment.NewLine +
+                    "Gender: " + ((AgeGender)sim.gender).ToString() + " / Frame: " + currentFrame.ToString() + Environment.NewLine +
+                    "Pregnant: " + isPregnant.ToString() + Environment.NewLine + "Skintone: " + sim.skin_tone.ToString("X16") +
+                    ", Overlay " + (currentTONE != null ? "Hue: " + currentTONE.Hue.ToString() + " Saturation: " + currentTONE.Saturation.ToString() : "-") +
+                    ", Shift: " + skincolorShift.ToString() + " (" + (tonePackage.Length > 0 ? Path.GetFileName(tonePackage) : "Not Found") + ")" + Environment.NewLine;
+                for (int i = 0; i < 5; i++)
+                {
+                    if (currentSpecies == Species.Human)
+                        info += physiqueNamesHuman[i] + ": " + physique[i] + Environment.NewLine;
+                    else
+                        info += physiqueNamesAnimal[i] + ": " + physique[i] + Environment.NewLine;
+                }
+                morphInfo += "Sim Modifier: " + tgi.ToString() + " (" + modName + "), Weight: " + m.amount.ToString() + ", Scaling: " + modAdjust.ToString() + ", Offset: " + modOffset.ToString() + Environment.NewLine;
+                simDesc = morphInfo + Environment.NewLine + morphInfo + Environment.NewLine;
+                File.AppendAllText(@"C:\face_extract\YA_Sims Infos.txt", simDesc + Environment.NewLine);
+
+
+
+            }
+            foreach (ulong id in sculpts)
+            {
+                TGI tgi = new TGI((uint)ResourceTypes.Sculpt, 0, id);
+                Sculpt sculpt = FetchGameSculpt(tgi, ref errorList);
+                if (sculpt == null) continue;
+                morphInfo += "Sculpt: " + tgi.ToString() + " (" + sculpt.region.ToString() + ")" + Environment.NewLine;
+
+            }
+        }
+
+
+    private void DisplaySim(TS4SaveGame.SimData sim, SimOccult occultState, int desiredLevelOfDetail)
         {
             bool debug = false;
             TroubleshootPackageBasic = (Package)Package.NewPackage(0);
