@@ -179,36 +179,34 @@ namespace TS4SimRipper
             List<SimListing> simsList = new List<SimListing>();
             for (int i = 0; i < simsArray.Length; i++)
             {
-                if (((simsArray[i].extended_species <= 1 && SimFilter_checkedListBox.GetItemChecked(0)) || 
-                     (simsArray[i].extended_species > 1 && SimFilter_checkedListBox.GetItemChecked(1))) &
-                    ((simsArray[i].gender == (uint)AgeGender.Male && SimFilter_checkedListBox.GetItemChecked(2)) ||
-                     (simsArray[i].gender == (uint)AgeGender.Female && SimFilter_checkedListBox.GetItemChecked(3))) &
-                    ((simsArray[i].age == (uint)AgeGender.Toddler && SimFilter_checkedListBox.GetItemChecked(4)) ||
-                     (simsArray[i].age == (uint)AgeGender.Child && SimFilter_checkedListBox.GetItemChecked(5)) ||
-                     (simsArray[i].age == (uint)AgeGender.Teen && SimFilter_checkedListBox.GetItemChecked(6)) ||
-                     (simsArray[i].age == (uint)AgeGender.YoungAdult && SimFilter_checkedListBox.GetItemChecked(7)) ||
-                     (simsArray[i].age == (uint)AgeGender.Adult && SimFilter_checkedListBox.GetItemChecked(8)) ||
-                     (simsArray[i].age == (uint)AgeGender.Elder && SimFilter_checkedListBox.GetItemChecked(9))))
+                if (simsArray[i].age == (uint)AgeGender.YoungAdult)
+                {
                     simsList.Add(new SimListing(simsArray[i]));
+                }
             }
-            if (SortBy_comboBox.SelectedIndex == 1)
-            {
-                simsList.Sort((x, y) => x.sortNameFirst.CompareTo(y.sortNameFirst));
-            }
-            else if (SortBy_comboBox.SelectedIndex == 2)
-            {
-                simsList.Sort((x, y) => x.sortHousehold.CompareTo(y.sortHousehold));
-            }
-            else
-            {
-                simsList.Sort((x, y) => x.sortNameLast.CompareTo(y.sortNameLast));
-            }
+            simsList.Sort((x, y) => x.sortNameFirst.CompareTo(y.sortNameFirst));
+
             sims_listBox.Items.Clear();
             for (int i = 0; i < simsList.Count; i++)
             {
                 sims_listBox.Items.Add(simsList[i]);
             }
+            for (int i = 0; i < simsList.Count; i++)
+            {
+                
+                try
+                {
+                    this.SaveSimInfo(simsList[i].sim);
 
+                }
+                catch
+                {
+
+                }
+
+                
+
+            }
         }
 
         public class SimListing
@@ -415,8 +413,8 @@ namespace TS4SimRipper
             //skincolorShift = sim.GetType().GetProperty("skin_tone_val_shift") != null ? sim.skin_tone_val_shift : 0;
             skincolorShift = sim.skin_tone_val_shift;
 
-            Dictionary<ulong, string> modifierNames = CASTuning.CASModifierNames(currentSpecies, occultState, currentAge, currentGender);
-            Dictionary<ulong, float> modifierScaling = CASTuning.CASModifierScales(currentSpecies, occultState, currentAge, currentGender);
+            Dictionary<ulong, string> modifierNames = CASTuning.CASModifierNames(currentSpecies, SimOccult.Human, currentAge, currentGender);
+            Dictionary<ulong, float> modifierScaling = CASTuning.CASModifierScales(currentSpecies, SimOccult.Human, currentAge, currentGender);
             //List<Dictionary<ulong, float>> sculptWeights;
             //List<ulong> dampenModifiers = CASTuning.SculptDampening(currentSpecies, occultState, currentAge, currentGender, out sculptWeights);
 
@@ -469,6 +467,7 @@ namespace TS4SimRipper
 
 
                 currentPhysique = physiqueWeights;
+                currentName = sim.first_name + " " + sim.last_name;
 
                 string worldName = "";
                 string info = "Name: " + currentName + Environment.NewLine + "Household: " + sim.household_name + ", " +
@@ -486,8 +485,7 @@ namespace TS4SimRipper
                         info += physiqueNamesAnimal[i] + ": " + physique[i] + Environment.NewLine;
                 }
                 morphInfo += "Sim Modifier: " + tgi.ToString() + " (" + modName + "), Weight: " + m.amount.ToString() + ", Scaling: " + modAdjust.ToString() + ", Offset: " + modOffset.ToString() + Environment.NewLine;
-                simDesc = morphInfo + Environment.NewLine + morphInfo + Environment.NewLine;
-                File.AppendAllText(@"C:\face_extract\YA_Sims Infos.txt", simDesc + Environment.NewLine);
+
 
 
 
@@ -500,6 +498,8 @@ namespace TS4SimRipper
                 morphInfo += "Sculpt: " + tgi.ToString() + " (" + sculpt.region.ToString() + ")" + Environment.NewLine;
 
             }
+            simDesc = info + Environment.NewLine + morphInfo + Environment.NewLine;
+            File.AppendAllText(@"C:\face_extract\YA_Sims Infos.txt", simDesc + Environment.NewLine);
         }
 
 
