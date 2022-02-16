@@ -466,24 +466,7 @@ namespace TS4SimRipper
                 }
 
 
-                currentPhysique = physiqueWeights;
-                currentName = sim.first_name + " " + sim.last_name;
 
-                string worldName = "";
-                string info = "Name: " + currentName + Environment.NewLine + "Household: " + sim.household_name + ", " +
-                    "World: " + (worldNames.TryGetValue(sim.zone_id, out worldName) ? worldName : "None") +
-                    Environment.NewLine + "Age: " + ((AgeGender)sim.age).ToString() + Environment.NewLine +
-                    "Gender: " + ((AgeGender)sim.gender).ToString() + " / Frame: " + currentFrame.ToString() + Environment.NewLine +
-                    "Pregnant: " + isPregnant.ToString() + Environment.NewLine + "Skintone: " + sim.skin_tone.ToString("X16") +
-                    ", Overlay " + (currentTONE != null ? "Hue: " + currentTONE.Hue.ToString() + " Saturation: " + currentTONE.Saturation.ToString() : "-") +
-                    ", Shift: " + skincolorShift.ToString() + " (" + (tonePackage.Length > 0 ? Path.GetFileName(tonePackage) : "Not Found") + ")" + Environment.NewLine;
-                for (int i = 0; i < 5; i++)
-                {
-                    if (currentSpecies == Species.Human)
-                        info += physiqueNamesHuman[i] + ": " + physique[i] + Environment.NewLine;
-                    else
-                        info += physiqueNamesAnimal[i] + ": " + physique[i] + Environment.NewLine;
-                }
                 morphInfo += "Sim Modifier: " + tgi.ToString() + " (" + modName + "), Weight: " + m.amount.ToString() + ", Scaling: " + modAdjust.ToString() + ", Offset: " + modOffset.ToString() + Environment.NewLine;
 
 
@@ -497,6 +480,24 @@ namespace TS4SimRipper
                 if (sculpt == null) continue;
                 morphInfo += "Sculpt: " + tgi.ToString() + " (" + sculpt.region.ToString() + ")" + Environment.NewLine;
 
+            }
+            currentPhysique = physiqueWeights;
+            currentName = sim.first_name + " " + sim.last_name;
+
+            string worldName = "";
+            string info = "Name: " + currentName + Environment.NewLine + "Household: " + sim.household_name + ", " +
+                "World: " + (worldNames.TryGetValue(sim.zone_id, out worldName) ? worldName : "None") +
+                Environment.NewLine + "Age: " + ((AgeGender)sim.age).ToString() + Environment.NewLine +
+                "Gender: " + ((AgeGender)sim.gender).ToString() + " / Frame: " + currentFrame.ToString() + Environment.NewLine +
+                "Pregnant: " + isPregnant.ToString() + Environment.NewLine + "Skintone: " + sim.skin_tone.ToString("X16") +
+                ", Overlay " + (currentTONE != null ? "Hue: " + currentTONE.Hue.ToString() + " Saturation: " + currentTONE.Saturation.ToString() : "-") +
+                ", Shift: " + skincolorShift.ToString() + " (" + (tonePackage.Length > 0 ? Path.GetFileName(tonePackage) : "Not Found") + ")" + Environment.NewLine;
+            for (int i = 0; i < 5; i++)
+            {
+                if (currentSpecies == Species.Human)
+                    info += physiqueNamesHuman[i] + ": " + physique[i] + Environment.NewLine;
+                else
+                    info += physiqueNamesAnimal[i] + ": " + physique[i] + Environment.NewLine;
             }
             simDesc = info + Environment.NewLine + morphInfo + Environment.NewLine;
             File.AppendAllText(@"C:\face_extract\YA_Sims Infos.txt", simDesc + Environment.NewLine);
