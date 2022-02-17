@@ -2353,7 +2353,14 @@ namespace TS4SimRipper
             {
                 if (vertWeights[i] > 0)
                 {
-                    if (boneHashes.Contains(this.bonehasharray[vertBones[i]])) weight += vertWeights[i] / 255f;
+                    try
+                    {
+                        if (boneHashes.Contains(this.bonehasharray[vertBones[i]])) weight += vertWeights[i] / 255f;
+                    }
+                    catch
+                    {
+                        return 0f;
+                    }
                 }
             }
             return weight;

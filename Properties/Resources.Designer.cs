@@ -89,12 +89,14 @@ namespace TS4SimRipper.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        internal static byte[] WaistFiller
-        {
-            get
-            {
-                object @object = Resources.ResourceManager.GetObject("WaistFiller", Resources.resourceCulture);
-                return (byte[])@object;
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] WaistFiller {
+            get {
+                object obj = ResourceManager.GetObject("WaistFiller", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

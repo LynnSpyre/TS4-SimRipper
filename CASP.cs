@@ -68,6 +68,7 @@ namespace TS4SimRipper
         // 30 bits reserved
         //  1 bit alien
         //  1 bit human
+        ulong unknown1;                 // Version 0x2E
         UInt64 oppositeGenderPart;      // Version 0x28 - If the current part is not compatible with the Sim due to frame/gender
         // restrictions, use this part instead. Maxis convention is to use this
         // to specify the opposite gender version of the part. Set to 0 for none.
@@ -79,6 +80,7 @@ namespace TS4SimRipper
         SliderSettings hueSlider;           // "
         SliderSettings saturationSlider;    // "
         SliderSettings brightnessSlider;    // "
+        byte unknown2;                      //Version 0x2E
         byte nakedKey;
         byte parentKey;
         int sortLayer;
@@ -557,6 +559,10 @@ namespace TS4SimRipper
             {
                 occultBitField = br.ReadUInt32();
             }
+            if (version >= 0x2E)
+            {
+                unknown1 = br.ReadUInt64();
+            }
             if (version >= 38)
             {
                 oppositeGenderPart = br.ReadUInt64();
@@ -571,6 +577,10 @@ namespace TS4SimRipper
                 hueSlider = new SliderSettings(br);
                 saturationSlider = new SliderSettings(br);
                 brightnessSlider = new SliderSettings(br);
+            }
+            if (version >= 0x2E)
+            {
+                unknown2 = br.ReadByte();
             }
             nakedKey = br.ReadByte();
             parentKey = br.ReadByte();
@@ -691,6 +701,10 @@ namespace TS4SimRipper
             {
                 bw.Write(occultBitField);
             }
+            if (version >= 0x2E)
+            {
+                bw.Write(unknown1);
+            }
             if (version >= 38)
             {
                 bw.Write(oppositeGenderPart);
@@ -705,6 +719,10 @@ namespace TS4SimRipper
                 hueSlider.Write(bw);
                 saturationSlider.Write(bw);
                 brightnessSlider.Write(bw);
+            }
+            if (version >= 0x2E)
+            {
+                bw.Write(unknown2);
             }
             bw.Write(nakedKey);
             bw.Write(parentKey);
