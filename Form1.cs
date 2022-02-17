@@ -13,6 +13,7 @@ using ProtoBuf;
 using s4pi.Package;
 using s4pi.Interfaces;
 using s4pi.ImageResource;
+using System.Reflection;
 
 namespace TS4SimRipper
 {
@@ -20,6 +21,7 @@ namespace TS4SimRipper
     {
         /// Remember to update this for each update!
         string version = "TS4 SimRipper v4.0.4";
+        string simModifierNamePath = "SimModifiers.txt";
         ulong[] frameIDMtF4male = new ulong[] { 0x27FE2BD7D11FDE65UL, 0x7A9D44AB67D00802UL };
         ulong[] frameIDMtF4female = new ulong[] { 0xA1A3F64ED26BCED8UL, 0x8ABEBBC4544AAE5BUL };
         ulong[] frameIDFtM = new ulong[] { 0x73290F92433C9DCCUL, 0xBD2A4BDE5C973977UL };
@@ -58,6 +60,7 @@ namespace TS4SimRipper
         bool canHaveBreasts;
 
         Dictionary<ulong, string> worldNames;
+        Dictionary<ulong, string> simModifierNames = new Dictionary<ulong, string>();
 
         string startupErrors = "";
         string simDesc = "";
@@ -104,6 +107,21 @@ namespace TS4SimRipper
             catch (Exception e)
             {
                 startupErrors += "CASModifierTuning: " + e.Message + Environment.NewLine;
+            }
+
+            string executingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string resourcePath = Path.Combine(executingPath, simModifierNamePath);
+            if (!File.Exists(resourcePath))
+            {
+                throw new ApplicationException("Can't load SimModifiers.txt");
+            }
+
+            string[] lines = File.ReadAllLines(resourcePath);
+
+            foreach (string line in lines)
+            {
+                string[] idToName = line.Split(' ');
+                simModifierNames[Convert.ToUInt64(idToName[0], 16)] = idToName[1];
             }
 
             SimFilter_checkedListBox.ItemCheck -= SimFilter_checkedListBox_ItemCheck;
@@ -191,7 +209,9 @@ namespace TS4SimRipper
             {
                 sims_listBox.Items.Add(simsList[i]);
             }
-            for (int i = 0; i < simsList.Count; i++)
+            //simsList.Count
+            //currently only have 281 sims rendered
+            for (int i = 0; i < 281; i++)
             {
                 
                 try
@@ -417,6 +437,10 @@ namespace TS4SimRipper
             Dictionary<ulong, float> modifierScaling = CASTuning.CASModifierScales(currentSpecies, SimOccult.Human, currentAge, currentGender);
             //List<Dictionary<ulong, float>> sculptWeights;
             //List<ulong> dampenModifiers = CASTuning.SculptDampening(currentSpecies, occultState, currentAge, currentGender, out sculptWeights);
+            foreach(var key in simModifierNames)
+            {
+                //Console.WriteLine(key.Key.ToString() + " " + key.Value);
+            }
 
             foreach (TS4SaveGame.Modifier m in faceModifiers)
             {
@@ -425,11 +449,29 @@ namespace TS4SimRipper
                 if (smod == null) continue;
 
                 string modName = smod.region.ToString();
-                Console.Write(modName);
-                if (modifierNames != null)
+
+                if (modName == null)
+                {
+                    modName = "";
+                }
+                if (modifierNames != null || simModifierNames.Count != 0)
                 {
                     string tmp = "";
-                    if (modifierNames.TryGetValue(m.key, out tmp)) modName = tmp;
+                    if (simModifierNames.TryGetValue(m.key, out tmp))
+                    {
+                        Console.WriteLine(tmp);
+
+                        modName = tmp;
+                    }
+                    else if (modifierNames != null)
+                    {
+                        if (modifierNames.TryGetValue(m.key, out tmp))
+                        {
+                            modName = tmp;
+
+                        }
+
+                    }
                 }
                 float modAdjust = 1f;
                 if (modifierScaling != null)
@@ -488,18 +530,20 @@ namespace TS4SimRipper
             string info = "Name: " + currentName + Environment.NewLine + "Household: " + sim.household_name + ", " +
                 "World: " + (worldNames.TryGetValue(sim.zone_id, out worldName) ? worldName : "None") +
                 Environment.NewLine + "Age: " + ((AgeGender)sim.age).ToString() + Environment.NewLine +
-                "Gender: " + ((AgeGender)sim.gender).ToString() + " / Frame: " + currentFrame.ToString() + Environment.NewLine +
-                "Pregnant: " + isPregnant.ToString() + Environment.NewLine + "Skintone: " + sim.skin_tone.ToString("X16") +
-                ", Overlay " + (currentTONE != null ? "Hue: " + currentTONE.Hue.ToString() + " Saturation: " + currentTONE.Saturation.ToString() : "-") +
-                ", Shift: " + skincolorShift.ToString() + " (" + (tonePackage.Length > 0 ? Path.GetFileName(tonePackage) : "Not Found") + ")" + Environment.NewLine;
+                "Gender: " + ((AgeGender)sim.gender).ToString() + " / Frame: " + currentFrame.ToString() + Environment.NewLine;
+
+            string info2 = "Pregnant: " + isPregnant.ToString() + Environment.NewLine + "Skintone: " + sim.skin_tone.ToString("X16");
+            string info3 = ", Overlay " + (currentTONE != null ? "Hue: " + currentTONE.Hue.ToString() + " Saturation: " + currentTONE.Saturation.ToString() : "-");
+            string info4 =   ", Shift: " + skincolorShift.ToString() + " (" + (tonePackage.Length > 0 ? Path.GetFileName(tonePackage) : "Not Found") + ")" + Environment.NewLine;
+            string info5 = "";
             for (int i = 0; i < 5; i++)
             {
                 if (currentSpecies == Species.Human)
-                    info += physiqueNamesHuman[i] + ": " + physique[i] + Environment.NewLine;
+                    info5 += physiqueNamesHuman[i] + ": " + physique[i] + Environment.NewLine;
                 else
-                    info += physiqueNamesAnimal[i] + ": " + physique[i] + Environment.NewLine;
+                    info5 += physiqueNamesAnimal[i] + ": " + physique[i] + Environment.NewLine;
             }
-            simDesc = info + Environment.NewLine + morphInfo + Environment.NewLine;
+            simDesc = info + info2 + info3 + info4 + info5 + Environment.NewLine + morphInfo + Environment.NewLine;
             File.AppendAllText(@"C:\face_extract\YA_Sims Infos.txt", simDesc + Environment.NewLine);
         }
 
