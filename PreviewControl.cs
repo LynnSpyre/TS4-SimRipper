@@ -1228,11 +1228,6 @@ namespace TS4SimRipper
                             errorList += "Somehow, your sim rig doesn't have slot bone " + slotBone.ToString();
 
                         }
-
-
-
-
-
                     }
                 }
                 catch(Exception ex)
