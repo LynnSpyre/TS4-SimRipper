@@ -640,7 +640,7 @@ namespace TS4SimRipper
                 SnapVertices();
                 MatchSeamStitches();
                 ApplyPregnancfyProgress();
-                UpdateSlotTargets();
+                UpdateSlotTargets(ref errorList);
                 // imageStack.Sort((x, y) => x.sortLayer.CompareTo(y.sortLayer));
                 // imageStack.OrderByDescending(s => s.compositionMethod).ThenBy(s => s.sortLayer).ToList();
                 imageStack.Sort((x, y) =>
@@ -1154,7 +1154,7 @@ namespace TS4SimRipper
             }
         }
 
-        private void UpdateSlotTargets()
+        private void UpdateSlotTargets(ref string errorList)
         {
             Dictionary<RIG.Bone, Vector3> morphedSlotBasePosition = new Dictionary<RIG.Bone, Vector3>();
             Dictionary<RIG.Bone, Vector3> morphedSlotBasePositionOffsets = new Dictionary<RIG.Bone, Vector3>();
@@ -1164,52 +1164,80 @@ namespace TS4SimRipper
                 if (morphMesh == null)
                     continue;
                 int slotRayIdx = 0;
-                foreach (GEOM.SlotrayIntersection slotRayIntersection in morphMesh.SlotrayAdjustments)
+                try
                 {
-                    //How Slot Ray Intersections work is simple, they specify three vertices specifying a face and barycentric coordinates.
-                    //The barycentric coordinates specify the exact point on the face where the slot's base position should be.
-                    //Then, we add offsetFromIntersectionOSForExport to the slot base position.
-                    //Note that these two positions are in world space!
-
-                    //Next, we check if currentBone already exists in morphedSlotBasePosition. If it exists already, then it will compare
-                    //the two slots' magnitude to determine what is further away from the sim.
-                    //This is necessary because multiple cas assets can affect the same slot.
-                    //If the currentBone doesn't exist, it just sets the position and the offsets as usual.
-
-                    //get bone hash of slot
-                    uint slotBone = slotRayIntersection.SlotIndex;
-                    //get verts specified for the intersection
-                    int[] vertIndices = slotRayIntersection.TrianglePointIndices;
-                    //get the barycentric coordinates for the intersection
-                    Vector2 coordinates = slotRayIntersection.Coordinates;
-                    //offset from intersection OS is the offset of the slot from the point on the face.
-                    Vector3 offsetFromIntersectionOS = slotRayIntersection.OffsetFromIntersectionOS;
-                    //get vertex positions AFTER dmaps and bonedeltas
-                    Vector3[] vertexPositions = morphMesh.SlotrayTrianglePositions(slotRayIdx);
-                    //calculate the point on the face from the barycentric coordinates
-                    float xPos = (1 - coordinates.X - coordinates.Y) * vertexPositions[0].X + (coordinates.X * vertexPositions[1].X) + (coordinates.Y * vertexPositions[2].X);
-                    float yPos = (1 - coordinates.X - coordinates.Y) * vertexPositions[0].Y + (coordinates.X * vertexPositions[1].Y) + (coordinates.Y * vertexPositions[2].Y);
-                    float zPos = (1 - coordinates.X - coordinates.Y) * vertexPositions[0].Z + (coordinates.X * vertexPositions[1].Z) + (coordinates.Y * vertexPositions[2].Z);
-                    Vector3 slotBasePosition = new Vector3(xPos, yPos, zPos);
-                    Vector3 offsetFromIntersectionOSForExport = new Vector3(offsetFromIntersectionOS.X, offsetFromIntersectionOS.Y, offsetFromIntersectionOS.Z);
-                    RIG.Bone currentBone = currentRig.GetBone(slotBone);
-
-                    if (morphedSlotBasePosition.ContainsKey(currentBone))
+                    foreach (GEOM.SlotrayIntersection slotRayIntersection in morphMesh.SlotrayAdjustments)
                     {
-                        if (morphedSlotBasePosition[currentBone].Magnitude < slotBasePosition.Magnitude)
+                        //How Slot Ray Intersections work is simple, they specify three vertices specifying a face and barycentric coordinates.
+                        //The barycentric coordinates specify the exact point on the face where the slot's base position should be.
+                        //Then, we add offsetFromIntersectionOSForExport to the slot base position.
+                        //Note that these two positions are in world space!
+
+                        //Next, we check if currentBone already exists in morphedSlotBasePosition. If it exists already, then it will compare
+                        //the two slots' magnitude to determine what is further away from the sim.
+                        //This is necessary because multiple cas assets can affect the same slot.
+                        //If the currentBone doesn't exist, it just sets the position and the offsets as usual.
+
+                        //get bone hash of slot
+                        uint slotBone = slotRayIntersection.SlotIndex;
+                        //get verts specified for the intersection
+                        int[] vertIndices = slotRayIntersection.TrianglePointIndices;
+                        //get the barycentric coordinates for the intersection
+                        Vector2 coordinates = slotRayIntersection.Coordinates;
+                        //offset from intersection OS is the offset of the slot from the point on the face.
+                        Vector3 offsetFromIntersectionOS = slotRayIntersection.OffsetFromIntersectionOS;
+                        //get vertex positions AFTER dmaps and bonedeltas
+                        Vector3[] vertexPositions = morphMesh.SlotrayTrianglePositions(slotRayIdx);
+                        //calculate the point on the face from the barycentric coordinates
+                        float xPos = (1 - coordinates.X - coordinates.Y) * vertexPositions[0].X + (coordinates.X * vertexPositions[1].X) + (coordinates.Y * vertexPositions[2].X);
+                        float yPos = (1 - coordinates.X - coordinates.Y) * vertexPositions[0].Y + (coordinates.X * vertexPositions[1].Y) + (coordinates.Y * vertexPositions[2].Y);
+                        float zPos = (1 - coordinates.X - coordinates.Y) * vertexPositions[0].Z + (coordinates.X * vertexPositions[1].Z) + (coordinates.Y * vertexPositions[2].Z);
+                        Vector3 slotBasePosition = new Vector3(xPos, yPos, zPos);
+                        Vector3 offsetFromIntersectionOSForExport = new Vector3(offsetFromIntersectionOS.X, offsetFromIntersectionOS.Y, offsetFromIntersectionOS.Z);
+                        try
                         {
-                            morphedSlotBasePosition[currentBone] = slotBasePosition;
-                            morphedSlotBasePositionOffsets[currentBone] = offsetFromIntersectionOSForExport;
+                            RIG.Bone currentBone = currentRig.GetBone(slotBone);
+                            try
+                            {
+
+                                if (morphedSlotBasePosition.ContainsKey(currentBone))
+                                {
+                                    if (morphedSlotBasePosition[currentBone].Magnitude < slotBasePosition.Magnitude)
+                                    {
+                                        morphedSlotBasePosition[currentBone] = slotBasePosition;
+                                        morphedSlotBasePositionOffsets[currentBone] = offsetFromIntersectionOSForExport;
+                                    }
+                                }
+                                else
+                                {
+                                    morphedSlotBasePosition[currentBone] = slotBasePosition;
+                                    morphedSlotBasePositionOffsets[currentBone] = offsetFromIntersectionOSForExport;
+
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                errorList += ex.ToString() + Environment.NewLine;
+                            }
+                            slotRayIdx += 1;
+
                         }
-                    }
-                    else
-                    {
-                        morphedSlotBasePosition[currentBone] = slotBasePosition;
-                        morphedSlotBasePositionOffsets[currentBone] = offsetFromIntersectionOSForExport;
+                        catch(Exception ex)
+                        {
+                            errorList += ex.ToString() + " " + Environment.NewLine;
+                            errorList += "Somehow, your sim rig doesn't have slot bone " + slotBone.ToString();
+
+                        }
+
+
+
+
 
                     }
-                    slotRayIdx += 1;
-
+                }
+                catch(Exception ex)
+                {
+                    errorList += ex.ToString() + Environment.NewLine;
                 }
             }
             //Finally, it adds the base slot position and the offset together. It also has to be converted to local space as the position is in world space.

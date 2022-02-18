@@ -812,7 +812,7 @@ namespace TS4SimRipper
                 if (irie != null)
                 {
                     Stream s = p.GetResource(irie);
-                    if (allCCInstances.ContainsKey(key)) SaveStream(irie, s, outfitNumber >= 0 ? TroubleshootPackageOutfit : TroubleshootPackageBasic);
+                    if (this.allCCInstances.ContainsKey(key)) SaveStream(irie, s, outfitNumber >= 0 ? TroubleshootPackageOutfit : TroubleshootPackageBasic);
                     try
                     {
                         BinaryReader br = new BinaryReader(s);
