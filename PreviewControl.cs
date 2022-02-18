@@ -1179,7 +1179,7 @@ namespace TS4SimRipper
                         //If the currentBone doesn't exist, it just sets the position and the offsets as usual.
 
                         //get bone hash of slot
-                        uint slotBone = slotRayIntersection.SlotIndex;
+
                         //get verts specified for the intersection
                         int[] vertIndices = slotRayIntersection.TrianglePointIndices;
                         //get the barycentric coordinates for the intersection
@@ -1196,10 +1196,42 @@ namespace TS4SimRipper
                         Vector3 offsetFromIntersectionOSForExport = new Vector3(offsetFromIntersectionOS.X, offsetFromIntersectionOS.Y, offsetFromIntersectionOS.Z);
                         try
                         {
-                            RIG.Bone currentBone = currentRig.GetBone(slotBone);
+                            RIG.Bone currentBone = null;
+                            if (slotRayIntersection.SlotHash != 0xFFFFFFFF)
+                            {
+                                uint slotHash = 0;
+                                try
+                                {
+                                    slotHash = slotRayIntersection.SlotHash;
+                                    currentBone = currentRig.GetBone(slotHash);
+                                }
+
+                                catch
+                                {
+                                    errorList += "Slot Assignment specified a hash that doesn't exist on the rig. " + slotHash.ToString() + System.Environment.NewLine;
+                                    continue;
+
+                                }
+
+                            }
+                            else
+                            {
+                                uint slotIdx = 0;
+                                try
+                                {
+                                    slotIdx = slotRayIntersection.SlotIndex;
+                                    currentBone = currentRig.Bones[slotIdx];
+                                }
+                                catch
+                                {
+                                    errorList += "Slot Index is out of bounds of the bones of the rig. " + slotIdx.ToString() + System.Environment.NewLine;
+                                    continue;
+
+                                }
+                            }
+    
                             try
                             {
-
                                 if (morphedSlotBasePosition.ContainsKey(currentBone))
                                 {
                                     if (morphedSlotBasePosition[currentBone].Magnitude < slotBasePosition.Magnitude)
@@ -1219,17 +1251,23 @@ namespace TS4SimRipper
                             {
                                 errorList += ex.ToString() + Environment.NewLine;
                             }
-                            slotRayIdx += 1;
+                            finally
+                            {
+                                slotRayIdx += 1;
 
+                            }
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             errorList += ex.ToString() + " " + Environment.NewLine;
-                            errorList += "Somehow, your sim rig doesn't have slot bone " + slotBone.ToString();
 
                         }
+     
+
                     }
+   
                 }
+                
                 catch(Exception ex)
                 {
                     errorList += ex.ToString() + Environment.NewLine;
