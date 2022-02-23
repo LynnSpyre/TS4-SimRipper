@@ -19,7 +19,7 @@ namespace TS4SimRipper
     public partial class Form1 : Form
     {
         /// Remember to update this for each update!
-        string version = "TS4 SimRipper v4.0.5";
+        string version = "TS4 SimRipper v4.0.6";
         ulong[] frameIDMtF4male = new ulong[] { 0x27FE2BD7D11FDE65UL, 0x7A9D44AB67D00802UL };
         ulong[] frameIDMtF4female = new ulong[] { 0xA1A3F64ED26BCED8UL, 0x8ABEBBC4544AAE5BUL };
         ulong[] frameIDFtM = new ulong[] { 0x73290F92433C9DCCUL, 0xBD2A4BDE5C973977UL };
