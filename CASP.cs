@@ -73,14 +73,15 @@ namespace TS4SimRipper
         // restrictions, use this part instead. Maxis convention is to use this
         // to specify the opposite gender version of the part. Set to 0 for none.
         UInt64 fallbackPart;            // Version 0x28 - If the current part is not compatible with the Sim due to frame/gender
-        // restrictions, and there is no mOppositeGenderPart specified, use this part.
-        // Maxis convention is to use this to specify a replacement part which is not
-        // necessarily the opposite gendered version of the part. Set to 0 for none.
+                                        // restrictions, and there is no mOppositeGenderPart specified, use this part.
+                                        // Maxis convention is to use this to specify a replacement part which is not
+                                        // necessarily the opposite gendered version of the part. Set to 0 for none.
         OpacitySettings opacitySlider;     //V 0x2C
         SliderSettings hueSlider;           // "
         SliderSettings saturationSlider;    // "
         SliderSettings brightnessSlider;    // "
-        byte unknown2;                      //Version 0x2E
+        byte unknownCount;                      //Version 0x2E
+        byte[] unknown2;                    //Version 0x2E - unknownCount bytes
         byte nakedKey;
         byte parentKey;
         int sortLayer;
@@ -220,7 +221,7 @@ namespace TS4SimRipper
 
         public bool DisallowOppositeGender
         {
-            get { return (this.parameterFlags & (byte)CASParamFlag.RestrictOppositeGender) > 0; }
+            get { return (this.parameterFlags & (byte)CASParamFlag.RestrictOppositeGender) > 0;  }
         }
         public bool DisallowOppositeFrame
         {
@@ -580,7 +581,8 @@ namespace TS4SimRipper
             }
             if (version >= 0x2E)
             {
-                unknown2 = br.ReadByte();
+                unknownCount = br.ReadByte();
+                unknown2 = br.ReadBytes(unknownCount);
             }
             nakedKey = br.ReadByte();
             parentKey = br.ReadByte();
@@ -722,7 +724,8 @@ namespace TS4SimRipper
             }
             if (version >= 0x2E)
             {
-                bw.Write(unknown2);
+                bw.Write((byte)unknown2.Length);
+                if (unknown2.Length > 0) bw.Write(unknown2);
             }
             bw.Write(nakedKey);
             bw.Write(parentKey);
