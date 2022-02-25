@@ -1216,16 +1216,23 @@ namespace TS4SimRipper
                             else
                             {
                                 uint slotIdx = 0;
-                                try
-                                {
-                                    slotIdx = slotRayIntersection.SlotIndex;
-                                    currentBone = currentRig.Bones[slotIdx];
-                                }
-                                catch
-                                {
-                                    errorList += "Slot Index is out of bounds of the bones of the rig. " + slotIdx.ToString() + System.Environment.NewLine;
-                                    continue;
 
+                                slotIdx = slotRayIntersection.SlotIndex;
+                                if (slotIdx != 0xFFFFFFFF)
+                                {
+
+
+                                    try
+                                    {
+
+                                        currentBone = currentRig.Bones[slotIdx];
+                                    }
+                                    catch
+                                    {
+                                        errorList += "Slot Index is out of bounds of the bones of the rig. " + slotIdx.ToString() + System.Environment.NewLine;
+                                        continue;
+
+                                    }
                                 }
                             }
     
