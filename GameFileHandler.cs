@@ -448,9 +448,7 @@ namespace TS4SimRipper
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
 
             if (this.allInstances.ContainsKey(key))
-            {
-                string err = "";
-                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
+            {                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -483,7 +481,6 @@ namespace TS4SimRipper
             if (tgi.Instance == 0ul) return null;
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
             {
-                string err = "";
                 Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 if (this.allInstances.ContainsKey(key))
@@ -522,7 +519,6 @@ namespace TS4SimRipper
 
             if (this.allInstances.ContainsKey(key))
             {
-                string err = "";
                 Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
@@ -557,7 +553,6 @@ namespace TS4SimRipper
 
             if (this.allInstances.ContainsKey(key))
             {
-                string err = "";
                 Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type  & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
@@ -593,8 +588,6 @@ namespace TS4SimRipper
         {
 
             if (tgi.Instance == 0ul) return null;
-            string err = "";
-
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
 
             if (this.allInstances.ContainsKey(key))
@@ -765,8 +758,6 @@ namespace TS4SimRipper
         }
         private LRLE FetchGameLRLE(TGI tgi, int outfitNumber, ref string errorMsg)
         {
-            string err = "";
-
             if (tgi.Instance == 0ul) return null;
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
 
@@ -911,7 +902,6 @@ namespace TS4SimRipper
 
             if (this.allInstances.ContainsKey(key))
             {
-                string err = "";
                 Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
@@ -942,9 +932,7 @@ namespace TS4SimRipper
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
 
             if (this.allInstances.ContainsKey(key))
-            {
-                string err = "";
-                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
+            {                Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
@@ -984,7 +972,6 @@ namespace TS4SimRipper
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
             if (this.allInstances.ContainsKey(key))
             {
-                string err = "";
                 Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
 
@@ -1018,7 +1005,6 @@ namespace TS4SimRipper
 
             if (this.allInstances.ContainsKey(key))
             {
-                string err = "";
                 Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
@@ -1057,7 +1043,6 @@ namespace TS4SimRipper
             (uint ResourceType, uint ResourceGroup, ulong Instance) key = (tgi.Type, tgi.Group, tgi.Instance);
             if (this.allInstances.ContainsKey(key))
             {
-                string err = "";
                 Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
@@ -1094,7 +1079,6 @@ namespace TS4SimRipper
 
             if (this.allInstances.ContainsKey(key))
             {
-                string err = "";
                 Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
 
                 Package p = this.allInstances[key].Item2;
@@ -1129,8 +1113,6 @@ namespace TS4SimRipper
             Predicate<IResourceIndexEntry> pred = r => r.ResourceType == tgi.Type & r.Instance == tgi.Instance;
             if (this.allInstances.ContainsKey(key))
             {
-                string err = "";
-
                 Package p = this.allInstances[key].Item2;
                 IResourceIndexEntry irie = p.Find(pred);
                 if (irie != null)

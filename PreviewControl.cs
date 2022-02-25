@@ -205,7 +205,6 @@ namespace TS4SimRipper
 
             if (morphShape != null && morphMesh.hasUVset(1))
             {
-                string tmp = "";
                 for (int i = 0; i < morphMesh.numberVertices; i++)
                 {
                     float[] pos = morphMesh.getPosition(i);
