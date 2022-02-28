@@ -338,6 +338,11 @@ namespace TS4SimRipper
                 MessageBox.Show("Selected sim is null!");
                 return;
             }
+            // Exclude all non randomly generated townies
+            if (sim.first_name != "YOUNGADULT"){
+
+                return;
+            }
             currentName = sim.first_name + " " + sim.last_name;
             currentSpecies = (Species)sim.extended_species;
             if (sim.extended_species == 0) currentSpecies = Species.Human;
@@ -415,7 +420,7 @@ namespace TS4SimRipper
             }
 
             DisplaySim(sim, currentOccult, (int)levelOfDetailUpDown.Value);
-            SaveModelMorph(MeshFormat.DAE, "YA_Sims\\");
+            SaveModelMorph(MeshFormat.DAE, this.currentSaveName + "\\");
 
         }
 
