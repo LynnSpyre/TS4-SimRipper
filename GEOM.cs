@@ -3894,7 +3894,8 @@ namespace TS4SimRipper
 
         public class SlotrayIntersection
         {
-            uint slotBone;
+            uint slotHash = 0xFFFFFFFF; //slot idx or slot hash
+            uint slotIndex = 0xFFFFFFFF;
             short[] vertIndices;        // short[3] indices of vertices making up face
             float[] coordinates;        // float[2] Barycentric coordinates of the point of intersection
             float distance;             // distance from raycast origin to the intersection point
@@ -3905,10 +3906,16 @@ namespace TS4SimRipper
 
             int parentVersion;
 
+            public uint SlotHash
+            {
+                get { return this.slotHash; }
+                set { this.slotHash = value; }
+            }
+
             public uint SlotIndex
             {
-                get { return this.slotBone; }
-                set { this.slotBone = value; }
+                get { return this.slotIndex; }
+                set { this.slotIndex = value; }
             }
             public int[] TrianglePointIndices
             {
@@ -3949,7 +3956,14 @@ namespace TS4SimRipper
             internal SlotrayIntersection(BinaryReader br, int version)
             {
                 this.parentVersion = version;
-                this.slotBone = br.ReadUInt32();
+                if (version >= 0x0E)
+                {
+                    this.slotHash = br.ReadUInt32();
+                }
+                else
+                {
+                    this.slotIndex = br.ReadUInt32();
+                }
                 this.vertIndices = new short[3];
                 for (int i = 0; i < 3; i++)
                 {
@@ -3988,8 +4002,14 @@ namespace TS4SimRipper
 
             public SlotrayIntersection(SlotrayIntersection faceAdjustment)
             {
-                this.slotBone = faceAdjustment.slotBone;
-                this.vertIndices = new short[3];
+                if (faceAdjustment.parentVersion >= 0x0E)
+                {
+                    this.slotHash = faceAdjustment.slotHash;
+                }
+                else
+                {
+                    this.slotIndex = faceAdjustment.slotIndex;
+                }                this.vertIndices = new short[3];
                 for (int i = 0; i < 3; i++)
                 {
                     this.vertIndices[i] = faceAdjustment.vertIndices[i];
@@ -4020,7 +4040,15 @@ namespace TS4SimRipper
 
             internal void Write(BinaryWriter bw)
             {
-                bw.Write(this.slotBone);
+                if (this.parentVersion >= 0x0E)
+                {
+                    bw.Write(this.slotHash);
+                }
+                else
+                {
+                    bw.Write(this.slotIndex);
+                }
+
                 for (int i = 0; i < this.vertIndices.Length; i++)
                 {
                     bw.Write(this.vertIndices[i]);

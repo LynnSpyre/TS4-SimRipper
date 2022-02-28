@@ -271,7 +271,8 @@ namespace TS4SimRipper
         SkinDetailScar = 0x47,
         SkinDetailAcne = 0x48,
         Fingernails = 0x49,
-        Toenails = 0x4A
+        Toenails = 0x4A,
+        HairColor = 0x4B
     }
 
     public enum BodySubType
