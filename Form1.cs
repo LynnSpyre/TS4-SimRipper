@@ -419,6 +419,7 @@ namespace TS4SimRipper
                 Pregnancy_trackBar.Enabled = false;
             }
 
+            Directory.CreateDirectory(this.currentSaveName);
             DisplaySim(sim, currentOccult, (int)levelOfDetailUpDown.Value);
             SaveModelMorph(MeshFormat.DAE, this.currentSaveName + "\\");
 
