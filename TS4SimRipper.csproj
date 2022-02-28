@@ -243,6 +243,9 @@
     <Content Include="CASModifierTuning.package">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SimModifiers.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="squishinterface_x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

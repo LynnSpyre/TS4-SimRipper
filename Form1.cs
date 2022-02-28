@@ -211,7 +211,7 @@ namespace TS4SimRipper
             }
             //simsList.Count
             //currently only have 281 sims rendered
-            for (int i = 0; i < 281; i++)
+            for (int i = 0; i < 2472; i++)
             {
                 
                 try
@@ -459,7 +459,7 @@ namespace TS4SimRipper
                     string tmp = "";
                     if (simModifierNames.TryGetValue(m.key, out tmp))
                     {
-                        Console.WriteLine(tmp);
+                       // Console.WriteLine(tmp);
 
                         modName = tmp;
                     }
@@ -544,7 +544,7 @@ namespace TS4SimRipper
                     info5 += physiqueNamesAnimal[i] + ": " + physique[i] + Environment.NewLine;
             }
             simDesc = info + info2 + info3 + info4 + info5 + Environment.NewLine + morphInfo + Environment.NewLine;
-            File.AppendAllText(@"C:\face_extract\YA_Sims Infos.txt", simDesc + Environment.NewLine);
+            File.AppendAllText(@"C:\face_extract 3\YA_Sims Infos.txt", simDesc + Environment.NewLine);
         }
 
 
