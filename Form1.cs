@@ -155,13 +155,17 @@ namespace TS4SimRipper
             {
                 int.TryParse(args[2], out maxThreads);
                 int.TryParse(args[3], out currentThreadIndex);
-                this.saveFileBatch = args[4];
+                this.saveFileBatch = args[4].Trim();
+            }
+            else if(args.Count() == 1)
+            {
+                throw new Exception("No parameters passed to mass exporter!");
             }
             else
             {
                 int.TryParse(args[1], out maxThreads);
                 int.TryParse(args[2], out currentThreadIndex);
-                this.saveFileBatch = args[3];
+                this.saveFileBatch = args[3].Trim();
             }
 
             this.SaveFileBatchProcess();
@@ -268,6 +272,9 @@ namespace TS4SimRipper
                     {
 
                     }
+
+
+
 
                 }
 
@@ -419,15 +426,16 @@ namespace TS4SimRipper
                 Pregnancy_trackBar.Enabled = false;
             }
 
-            Directory.CreateDirectory(this.currentSaveName);
             DisplaySim(sim, currentOccult, (int)levelOfDetailUpDown.Value);
-
             string saveName = this.currentSaveName;
             if(saveName == "My Saved Game 1,064")
             {
-                saveName = "5K YA Sims Set 1";
+                saveName = "5K YA Sims Set 1";          
             }
-            SaveModelMorph(MeshFormat.DAE, saveName + "\\");
+            Directory.CreateDirectory(System.IO.Path.Combine(@"E:\", "Saves"));
+            Directory.CreateDirectory(System.IO.Path.Combine(@"E:\", "Saves", saveName));
+
+            SaveModelMorph(MeshFormat.DAE, Path.Combine(@"E:\", "Saves", saveName));
 
         }
 
