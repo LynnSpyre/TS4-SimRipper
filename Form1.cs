@@ -421,7 +421,13 @@ namespace TS4SimRipper
 
             Directory.CreateDirectory(this.currentSaveName);
             DisplaySim(sim, currentOccult, (int)levelOfDetailUpDown.Value);
-            SaveModelMorph(MeshFormat.DAE, this.currentSaveName + "\\");
+
+            string saveName = this.currentSaveName;
+            if(saveName == "My Saved Game 1,064")
+            {
+                saveName = "5K YA Sims Set 1";
+            }
+            SaveModelMorph(MeshFormat.DAE, saveName + "\\");
 
         }
 
