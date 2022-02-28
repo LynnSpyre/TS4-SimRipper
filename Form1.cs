@@ -105,7 +105,7 @@ namespace TS4SimRipper
 			
 			try
 			{
-            CASTuning = new CASModifierTuning(gamePackages, gamePackageNames, notBaseGame, this, allMaxisInstances, allCCInstances);
+            CASTuning = new CASModifierTuning(gamePackages, gamePackageNames, this, allMaxisInstances, allCCInstances);
 			}
 
             catch (Exception e)
@@ -1479,7 +1479,7 @@ namespace TS4SimRipper
             {
                 CurrentModel[i] = LoadDMapMorph(BaseModel[i], pregnantModifier[0], pregnantModifier[1]);
             }
-            UpdateSlotTargets();
+            UpdateSlotTargets(ref errorList);
             morphPreview1.Stop_Mesh();
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, currentTexture, currentClothingSpecular, 
                 currentGlassTexture, currentGlassSpecular, true, SeparateMeshes_comboBox.SelectedIndex == 2);
