@@ -694,18 +694,31 @@ namespace TS4SimRipper
                                 ShiftTexture((Bitmap)imageStack[i].image, imageStack[i].HueShift, imageStack[i].SaturationShift, imageStack[i].BrightnessShift);
 
                             }
-                            if (imageStack[i].compositionMethod == 2)
+
+                            //TODO some old skin cc causes current Tone to be none, so this is a fallback.
+                            if(currentTONE == null)
                             {
-                                alphaMatrix[3][3] = currentTONE.SkinSets[0].MakeupOpacity * imageStack[i].Opacity;
-                            }
-                            else if (imageStack[i].compositionMethod == 4)
-                            {
-                                alphaMatrix[3][3] = currentTONE.SkinSets[0].MakeupOpacity2 * imageStack[i].Opacity;
+
+                                alphaMatrix[3][3] = imageStack[i].Opacity;
+
                             }
                             else
                             {
-                                alphaMatrix[3][3] = imageStack[i].Opacity;
+                                if (imageStack[i].compositionMethod == 2)
+                                {
+                                    alphaMatrix[3][3] = currentTONE.SkinSets[0].MakeupOpacity * imageStack[i].Opacity;
+                                }
+                                else if (imageStack[i].compositionMethod == 4)
+                                {
+                                    alphaMatrix[3][3] = currentTONE.SkinSets[0].MakeupOpacity2 * imageStack[i].Opacity;
+                                }
+                                else
+                                {
+                                    alphaMatrix[3][3] = imageStack[i].Opacity;
+                                }
                             }
+
+
                             ColorMatrix convert = new ColorMatrix(alphaMatrix);
                             ImageAttributes attributes = new ImageAttributes();
                             attributes.SetColorMatrix(convert);
