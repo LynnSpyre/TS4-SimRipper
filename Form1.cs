@@ -211,18 +211,21 @@ namespace TS4SimRipper
             }
             //simsList.Count
             //currently only have 281 sims rendered
-            for (int i = 0; i < 2472; i++)
+            for (int i = 0; i < simsList.Count; i++)
             {
-                
-                try
+                if (simsList[i].sim.first_name.StartsWith("YOUNGADULT"))
                 {
-                    this.SaveSimInfo(simsList[i].sim);
+                    try
+                    {
+                        this.SaveSimInfo(simsList[i].sim);
 
-                }
-                catch
-                {
+                    }
+                    catch
+                    {
 
+                    }
                 }
+
 
                 
 
@@ -544,7 +547,7 @@ namespace TS4SimRipper
                     info5 += physiqueNamesAnimal[i] + ": " + physique[i] + Environment.NewLine;
             }
             simDesc = info + info2 + info3 + info4 + info5 + Environment.NewLine + morphInfo + Environment.NewLine;
-            File.AppendAllText(@"C:\face_extract 3\YA_Sims Infos.txt", simDesc + Environment.NewLine);
+            File.AppendAllText(@"E:\YA Sims Rendered New 1\Set 2.txt", simDesc + Environment.NewLine);
         }
 
 
