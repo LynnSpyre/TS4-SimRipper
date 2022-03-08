@@ -1248,6 +1248,11 @@ namespace TS4SimRipper
                                     }
                                 }
                             }
+
+                            if(currentBone == null)
+                            {
+                                continue;
+                            }
     
                             try
                             {
