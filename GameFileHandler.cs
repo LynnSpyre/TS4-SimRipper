@@ -119,8 +119,7 @@ namespace TS4SimRipper
                 addPathsAccordingToPatchPriority(pathsClient, ref orderedPathsClient, "Client", "ClientDelta", "ClientFull", emptyList);
                 addPathsAccordingToPatchPriority(pathsSim, ref orderedPathsSim, "Simulation", "SimulationDelta", "SimulationFull", emptyList);
 
-                //pathsNoLegacySim.Sort();
-                //pathsNoLegacyClient.Sort();
+
                 paths.AddRange(orderedPathsSim);
                 paths.AddRange(orderedPathsClient);
             }
@@ -169,7 +168,6 @@ namespace TS4SimRipper
                         Package p = OpenPackage(paths[i], false);
                         if (p == null)
                         {
-
                             err += paths[i] + " is NULL" + Environment.NewLine;
                             paths[i] = null;
                             continue;
@@ -179,22 +177,26 @@ namespace TS4SimRipper
                             foreach (IResourceIndexEntry indexEntry in p.GetResourceList)
                             {
 
+
                                 (uint ResourceType, uint ResourceGroup, ulong Instance) key = (indexEntry.ResourceType, indexEntry.ResourceGroup, indexEntry.Instance);
+                                bool deleted = indexEntry.Compressed == 0xFFE0;
 
-                                if (this.allMaxisInstances.ContainsKey(key))
+                                if (!deleted)
                                 {
-                                    this.allMaxisInstances.Remove(key);
+                                    if (this.allMaxisInstances.ContainsKey(key))
+                                    {
+                                        this.allMaxisInstances.Remove(key);
+                                    }
+
+                                    if (this.allInstances.ContainsKey(key))
+                                    {
+                                        this.allInstances.Remove(key);
+
+                                    }
+
+                                    this.allMaxisInstances.Add(key, (paths[i], p));
+                                    this.allInstances.Add(key, (paths[i], p));
                                 }
-
-                                if (this.allInstances.ContainsKey(key))
-                                {
-                                    this.allInstances.Remove(key);
-
-                                }
-
-                                this.allMaxisInstances.Add(key, (paths[i], p));
-                                this.allInstances.Add(key, (paths[i], p));
-
                             }
                         }
                         gamePacks.Add(p);
@@ -304,6 +306,11 @@ namespace TS4SimRipper
         {
             for (int i = 0; i < inputPaths.Count; i++)
             {
+                // Don't include legacy edition packages
+                if (inputPaths[i].Contains("Delta_LE"))
+                {
+                    continue;
+                }
                 if (packTypes.Count == 0)
                 {
                     if (inputPaths[i].Contains(desiredPackagePrefix))
